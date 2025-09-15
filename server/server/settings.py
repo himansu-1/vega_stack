@@ -85,9 +85,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'vega_stack_db',
-        'USER': 'postgres',
-        'PASSWORD': 'Himansu@2001',
-        'HOST': 'localhost',
+        'USER': 'himansu',
+        'PASSWORD': '73FPEP2tRTrGpXdlOfn7TCnvkC9KZwRA',
+        'HOST': 'dpg-d33t6ummcj7s73alvmvg-a.render.internal',
         'PORT': '5432',
     }
     # 'default': {
