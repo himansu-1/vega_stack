@@ -87,7 +87,7 @@ DATABASES = {
         'NAME': 'vega_stack_db',
         'USER': 'himansu',
         'PASSWORD': '73FPEP2tRTrGpXdlOfn7TCnvkC9KZwRA',
-        'HOST': 'dpg-d33t6ummcj7s73alvmvg-a.render.internal',
+        'HOST': 'dpg-d33t6ummcj7s73alvmvg-a',
         'PORT': '5432',
     }
     # 'default': {
