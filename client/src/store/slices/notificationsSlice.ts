@@ -33,8 +33,8 @@ export const fetchNotifications = createAsyncThunk(
 
       const response = await notificationAPI.getNotifications();
       return response.data.results || response.data;
-    } catch (error: any) {
-      const message = error.response?.data?.error || 'Failed to fetch notifications';
+    } catch (error: unknown) {
+      const message = (error as any)?.response?.data?.error || 'Failed to fetch notifications';
       return rejectWithValue(message);
     }
   }
@@ -46,7 +46,7 @@ export const markNotificationAsRead = createAsyncThunk(
     try {
       await notificationAPI.markAsRead(id);
       return id;
-    } catch (error: any) {
+    } catch (error: unknown) {
       const message = error.response?.data?.error || 'Failed to mark notification as read';
       return rejectWithValue(message);
     }
@@ -59,7 +59,7 @@ export const markAllNotificationsAsRead = createAsyncThunk(
     try {
       await notificationAPI.markAllAsRead();
       return true;
-    } catch (error: any) {
+    } catch (error: unknown) {
       const message = error.response?.data?.error || 'Failed to mark all notifications as read';
       return rejectWithValue(message);
     }

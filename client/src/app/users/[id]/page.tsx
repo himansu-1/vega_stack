@@ -1,8 +1,8 @@
 'use client';
 import React, { useEffect } from "react";
 import { fetchUser, fetchUserPosts } from "@/store/slices/usersSlice";
-import { useParams, useRouter } from "next/navigation";
-import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "next/navigation";
+import { useDispatch } from "react-redux";
 import Navigation from "@/components/Navigation";
 import ProfileDetails from "@/components/ProfileDetails";
 
@@ -13,9 +13,9 @@ export default function UserProfilePage() {
     useEffect(() => {
         // Ensure id is defined and a valid number before dispatching
         if (id && !isNaN(Number(id))) {
-            // @ts-ignore: Suppress type error for dispatching thunk
+            // @ts-expect-error: Suppress type error for dispatching thunk
             dispatch(fetchUser(Number(id)));
-            // @ts-ignore: Suppress type error for dispatching thunk
+            // @ts-expect-error: Suppress type error for dispatching thunk
             dispatch(fetchUserPosts(Number(id)));
         }
     }, [dispatch, id]);

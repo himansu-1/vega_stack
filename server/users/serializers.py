@@ -54,11 +54,22 @@ class UserEditSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['email', 'username', 'first_name', 'last_name', 'password',
-                  'is_active', 'role', 'avatar_url', 'website', 'location',
-                  'followers_count', 'following_count', 'posts_count', 'bio', 'is_active']
+                  'avatar_url', 'website', 'location', 'bio']
         extra_kwargs = {
-            'password': {'write_only': True, 'required': False}
+            'password': {'write_only': True, 'required': False},
+            'email': {'required': False},
+            'username': {'required': False}
         }
+
+    def validate_email(self, value):
+        if User.objects.filter(email=value).exclude(id=self.instance.id).exists():
+            raise serializers.ValidationError("A user with this email already exists.")
+        return value
+
+    def validate_username(self, value):
+        if User.objects.filter(username=value).exclude(id=self.instance.id).exists():
+            raise serializers.ValidationError("A user with this username already exists.")
+        return value
 
     def update(self, instance, validated_data):
         if 'password' in validated_data:

@@ -1,16 +1,23 @@
 import { useSelector, useDispatch } from "react-redux";
+import type { RootState } from "../store";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { fetchUser, fetchUserPosts, followUser, unfollowUser, fetchFollowing } from "@/store/slices/usersSlice";
 import { deletePost, updatePost } from "@/store/slices/postsSlice";
-import { socialAPI, userAPI } from "@/lib/api";
+import { Post, userAPI } from "@/lib/api";
 import PostCard from "./PostCard";
-import { UserPlus, UserMinus, Trash2, AlertTriangle } from "lucide-react";
+import { UserPlus, UserMinus, AlertTriangle } from "lucide-react";
 import toast from "react-hot-toast";
+import Image from "next/image";
 
-export default function ProfileDetails({ id, dispatch }: { id: any, dispatch: any }) {
-    const { selectedUser, selectedPosts, following } = useSelector((state: any) => state.users);
-    const { user: currentUser } = useSelector((state: any) => state.auth);
+interface ProfileDetailsProps {
+    id: string | number;
+    dispatch: (action: { type: string; payload?: any }) => void;
+}
+
+export default function ProfileDetails({ id, dispatch }: ProfileDetailsProps) {
+    const { selectedUser, selectedPosts, following } = useSelector((state: RootState) => state.users);
+    const { user: currentUser } = useSelector((state: RootState) => state.auth);
     const router = useRouter();
     const reduxDispatch = useDispatch();
     const [isFollowing, setIsFollowing] = useState(false);
@@ -19,14 +26,14 @@ export default function ProfileDetails({ id, dispatch }: { id: any, dispatch: an
     useEffect(() => {
         // Ensure id is defined and a valid number before dispatching
         if (id && !isNaN(Number(id))) {
-            // @ts-ignore: Suppress type error for dispatching thunk
+            // @ts-expect-error: Suppress type error for dispatching thunk
             dispatch(fetchUser(Number(id)));
-            // @ts-ignore: Suppress type error for dispatching thunk
+            // @ts-expect-error: Suppress type error for dispatching thunk
             dispatch(fetchUserPosts(Number(id)));
             
             // Load following data to check follow status
             if (currentUser) {
-                // @ts-ignore: Suppress type error for dispatching thunk
+                // @ts-expect-error: Suppress type error for dispatching thunk
                 reduxDispatch(fetchFollowing(currentUser.id));
             }
         }
@@ -36,7 +43,7 @@ export default function ProfileDetails({ id, dispatch }: { id: any, dispatch: an
     useEffect(() => {
         if (selectedUser && currentUser) {
             // Use is_following field from API first, fallback to following array
-            const followingStatus = selectedUser.is_following || following.some((follow: any) => follow.following === selectedUser.id);
+            const followingStatus = selectedUser.is_following || following.some((follow: { following: number }) => follow.following === selectedUser.id);
             setIsFollowing(followingStatus);
         }
     }, [selectedUser, currentUser, following]);
@@ -47,11 +54,11 @@ export default function ProfileDetails({ id, dispatch }: { id: any, dispatch: an
         setIsLoading(true);
         try {
             if (isFollowing) {
-                // @ts-ignore: Suppress type error for dispatching thunk
+                // @ts-expect-error: Suppress type error for dispatching thunk
                 await reduxDispatch(unfollowUser(selectedUser.id));
                 setIsFollowing(false);
             } else {
-                // @ts-ignore: Suppress type error for dispatching thunk
+                // @ts-expect-error: Suppress type error for dispatching thunk
                 await reduxDispatch(followUser(selectedUser.id));
                 setIsFollowing(true);
             }
@@ -73,24 +80,24 @@ export default function ProfileDetails({ id, dispatch }: { id: any, dispatch: an
             
             if (doubleConfirm) {
                 try {
-                    await userAPI.deleteUser(selectedUser.id);
+                    await userAPI.deleteUser(selectedUser?.id || 0);
                     toast.success('Account deleted successfully');
                     // Redirect to home page after account deletion
                     router.push('/');
-                } catch (error: any) {
-                    const message = error.response?.data?.error || 'Failed to delete account';
+                } catch (error: unknown) {
+                    const message = (error as any)?.response?.data?.error || 'Failed to delete account';
                     toast.error(message);
                 }
             }
         }
     };
 
-    const handlePostUpdate = async (post: any) => {
+    const handlePostUpdate = async (post: { id: number; content: string; image?: string }) => {
         try {
-            // @ts-ignore: Suppress type error for dispatching thunk
+            // @ts-expect-error: Suppress type error for dispatching thunk
             await reduxDispatch(updatePost({ id: post.id, data: post }));
             // Refresh user posts
-            // @ts-ignore: Suppress type error for dispatching thunk
+            // @ts-expect-error: Suppress type error for dispatching thunk
             dispatch(fetchUserPosts(Number(id)));
         } catch (error) {
             console.error('Error updating post:', error);
@@ -99,10 +106,10 @@ export default function ProfileDetails({ id, dispatch }: { id: any, dispatch: an
 
     const handlePostDelete = async (postId: number) => {
         try {
-            // @ts-ignore: Suppress type error for dispatching thunk
+            // @ts-expect-error: Suppress type error for dispatching thunk
             await reduxDispatch(deletePost(postId));
             // Refresh user posts
-            // @ts-ignore: Suppress type error for dispatching thunk
+            // @ts-expect-error: Suppress type error for dispatching thunk
             dispatch(fetchUserPosts(Number(id)));
         } catch (error) {
             console.error('Error deleting post:', error);
@@ -117,10 +124,12 @@ export default function ProfileDetails({ id, dispatch }: { id: any, dispatch: an
                 <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center space-x-6">
                         {selectedUser?.avatar_url ? (
-                            <img
+                            <Image
                                 src={selectedUser?.avatar_url}
                                 alt={selectedUser?.username}
                                 className="w-24 h-24 rounded-full object-cover"
+                                width={96}
+                                height={96}
                             />
                         ) : (
                             <div className="w-24 h-24 rounded-full bg-blue-600 flex items-center justify-center text-white text-2xl font-bold">
@@ -207,7 +216,7 @@ export default function ProfileDetails({ id, dispatch }: { id: any, dispatch: an
                     </div>
                     <div>
                         <p className="font-medium text-gray-500">Joined</p>
-                        <p className="text-gray-900">{new Date(selectedUser?.date_joined).toLocaleDateString()}</p>
+                        <p className="text-gray-900">{new Date(selectedUser?.date_joined || '').toLocaleDateString()}</p>
                     </div>
                     <div>
                         <p className="font-medium text-gray-500">Last Login</p>
@@ -256,10 +265,10 @@ export default function ProfileDetails({ id, dispatch }: { id: any, dispatch: an
             </div>
 
             {/* Posts */}
-            {selectedPosts.map((post: any) => (
+            {selectedPosts.map((post: { id: number; content: string; image?: string; created_at: string; author: { id: number; username: string; profile_picture?: string } }) => (
                 <PostCard
                     key={post.id}
-                    post={post}
+                    post={post as Post}
                     onPostUpdated={handlePostUpdate}
                     onPostDeleted={handlePostDelete}
                 />

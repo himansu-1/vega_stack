@@ -1,60 +1,12 @@
 'use client';
 
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { fetchPosts } from '@/store/slices/postsSlice';
-import { updateUserProfile } from '@/store/slices/authSlice';
 import Navigation from '@/components/Navigation';
-import FollowersFollowingModal from '@/components/FollowersFollowingModal';
-import { formatNumber } from '@/lib/utils';
-import { Edit, Settings, User, Mail, Globe, MapPin } from 'lucide-react';
 import ProfileDetails from '@/components/ProfileDetails';
 
 export default function ProfilePage() {
   const { user, isLoading, isAuthenticated } = useAppSelector((state) => state.auth);
-  const { posts, isLoading: postsLoading } = useAppSelector((state) => state.posts);
   const dispatch = useAppDispatch();
-  const router = useRouter();
-  const [editing, setEditing] = useState(false);
-  const [editForm, setEditForm] = useState({
-    bio: user?.bio || '',
-    website: user?.website || '',
-    location: user?.location || '',
-  });
-  const [modalState, setModalState] = useState<{
-    isOpen: boolean;
-    type: 'followers' | 'following';
-  }>({ isOpen: false, type: 'followers' });
-
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.push('/');
-    }
-  }, [user, isLoading, isAuthenticated, router]);
-
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      dispatch(fetchPosts());
-    }
-  }, [dispatch, isAuthenticated, user]);
-
-  useEffect(() => {
-    if (user) {
-      setEditForm({
-        bio: user.bio || '',
-        website: user.website || '',
-        location: user.location || '',
-      });
-    }
-  }, [user]);
-
-  const handleSaveProfile = async () => {
-    await dispatch(updateUserProfile(editForm));
-    setEditing(false);
-  };
-
-  const userPosts = posts.filter(post => post.author.id === user?.id);
 
   if (isLoading) {
     return (

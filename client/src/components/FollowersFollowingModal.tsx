@@ -3,8 +3,9 @@
 import { useEffect, useState } from 'react';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { fetchFollowers, fetchFollowing } from '@/store/slices/usersSlice';
-import { formatNumber } from '@/lib/utils';
 import { X, UserPlus, UserMinus } from 'lucide-react';
+import { User } from '@/lib/api';
+import Image from 'next/image';
 
 interface FollowersFollowingModalProps {
   isOpen: boolean;
@@ -88,13 +89,15 @@ export default function FollowersFollowingModal({
             </div>
           ) : (
             <div className="space-y-2 p-4">
-              {users.map((userItem: any) => (
+              {users.map((userItem: User) => (
                 <div key={userItem.id} className="flex items-center space-x-3 p-3 hover:bg-gray-50 rounded-lg">
                   {userItem.avatar_url ? (
-                    <img
+                    <Image
                       src={userItem.avatar_url}
                       alt={userItem.username}
                       className="h-10 w-10 rounded-full object-cover"
+                      width={40}
+                      height={40}
                     />
                   ) : (
                     <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-medium">

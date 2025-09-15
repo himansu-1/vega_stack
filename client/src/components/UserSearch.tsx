@@ -6,6 +6,8 @@ import { fetchFollowing, fetchUsers, followUser, searchUsers, unfollowUser } fro
 import { formatNumber } from '@/lib/utils';
 import { UserPlus, UserMinus, Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { User } from '@/lib/api';
+import Image from 'next/image';
 
 export default function UserSearch() {
   const { user } = useAppSelector((state) => state.auth);
@@ -104,10 +106,12 @@ export default function UserSearch() {
                 <div className="p-6 cursor-pointer">
                 <div className="flex items-center space-x-4 mb-4">
                   {userItem.avatar_url ? (
-                    <img
+                    <Image
                       src={userItem.avatar_url}
                       alt={userItem.username}
                       className="h-12 w-12 rounded-full object-cover"
+                      width={48}
+                      height={48}
                     />
                   ) : (
                     <div className="h-12 w-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-medium">
@@ -164,7 +168,7 @@ export default function UserSearch() {
                       </span>
                     )}
                     
-                    {(userItem as any).date_joined && (
+                    {(userItem as User).date_joined && (
                       <span className="text-xs text-gray-400">
                         Joined {new Date((userItem as any).date_joined).toLocaleDateString('en-US', { 
                           month: 'short', 
@@ -228,7 +232,7 @@ export default function UserSearch() {
 
         {searchTerm && filteredUsers.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-gray-500 text-lg">No users found matching "{searchTerm}"</p>
+            <p className="text-gray-500 text-lg">No users found matching &quot;{searchTerm}&quot;</p>
           </div>
         )}
       </div>

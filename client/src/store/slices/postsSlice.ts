@@ -6,7 +6,7 @@ interface PostsState {
   posts: Post[];
   feed: Post[];
   currentPost: Post | null;
-  comments: any[];
+  comments: Array<{ id: number; content: string; author: { id: number; username: string; avatar_url?: string } }>;
   isLoading: boolean;
   isCreating: boolean;
   error: string | null;
@@ -29,8 +29,8 @@ export const fetchPosts = createAsyncThunk(
     try {
       const response = await postAPI.getPosts();
       return response.data.results || response.data;
-    } catch (error: any) {
-      const message = error.response?.data?.error || 'Failed to fetch posts';
+    } catch (error: unknown) {
+      const message = (error as any)?.response?.data?.error || 'Failed to fetch posts';
       return rejectWithValue(message);
     }
   }
@@ -42,7 +42,7 @@ export const fetchFeed = createAsyncThunk(
     try {
       const response = await postAPI.getFeed();
       return response.data.results || response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       const message = error.response?.data?.error || 'Failed to fetch feed';
       return rejectWithValue(message);
     }
@@ -56,7 +56,7 @@ export const createPost = createAsyncThunk(
       const response = await postAPI.createPost(postData);
       toast.success('Post created successfully!');
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       const message = error.response?.data?.error || 'Failed to create post';
       toast.error(message);
       return rejectWithValue(message);
@@ -71,7 +71,7 @@ export const updatePost = createAsyncThunk(
       const response = await postAPI.updatePost(id, data);
       toast.success('Post updated successfully!');
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       const message = error.response?.data?.error || 'Failed to update post';
       toast.error(message);
       return rejectWithValue(message);
@@ -86,7 +86,7 @@ export const deletePost = createAsyncThunk(
       await postAPI.deletePost(id);
       toast.success('Post deleted successfully!');
       return id;
-    } catch (error: any) {
+    } catch (error: unknown) {
       const message = error.response?.data?.error || 'Failed to delete post';
       toast.error(message);
       return rejectWithValue(message);
@@ -100,7 +100,7 @@ export const likePost = createAsyncThunk(
     try {
       await postAPI.likePost(id);
       return id;
-    } catch (error: any) {
+    } catch (error: unknown) {
       const message = error.response?.data?.error || 'Failed to like post';
       return rejectWithValue(message);
     }
@@ -113,7 +113,7 @@ export const unlikePost = createAsyncThunk(
     try {
       await postAPI.unlikePost(id);
       return id;
-    } catch (error: any) {
+    } catch (error: unknown) {
       const message = error.response?.data?.error || 'Failed to unlike post';
       return rejectWithValue(message);
     }
@@ -126,7 +126,7 @@ export const fetchComments = createAsyncThunk(
     try {
       const response = await commentAPI.getComments(postId);
       return { postId, comments: response.data.results || response.data };
-    } catch (error: any) {
+    } catch (error: unknown) {
       const message = error.response?.data?.error || 'Failed to fetch comments';
       return rejectWithValue(message);
     }
@@ -140,7 +140,7 @@ export const createComment = createAsyncThunk(
       const response = await commentAPI.createComment(postId, { content });
       toast.success('Comment added successfully!');
       return { postId, comment: response.data };
-    } catch (error: any) {
+    } catch (error: unknown) {
       const message = error.response?.data?.error || 'Failed to add comment';
       toast.error(message);
       return rejectWithValue(message);
@@ -155,7 +155,7 @@ export const deleteComment = createAsyncThunk(
       await commentAPI.deleteComment(id);
       toast.success('Comment deleted successfully!');
       return id;
-    } catch (error: any) {
+    } catch (error: unknown) {
       const message = error.response?.data?.error || 'Failed to delete comment';
       toast.error(message);
       return rejectWithValue(message);

@@ -9,18 +9,19 @@ import {
   MessageCircle, 
   Share, 
   MoreHorizontal,
-  User,
   Trash2,
   Edit,
-  Image,
+  Image as ImageLucide,
   X
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
+import { Post } from '@/lib/api';
+import Image from 'next/image';
 
 interface PostCardProps {
-  post: any; // Post type from Redux
-  onPostUpdated: (post: any) => void;
+  post: Post; // Post type from Redux
+  onPostUpdated: (post: Post) => void;
   onPostDeleted: (postId: number) => void;
 }
 
@@ -144,7 +145,7 @@ export default function PostCard({ post, onPostUpdated, onPostDeleted }: PostCar
     }
 
     try {
-      const updateData: any = { 
+      const updateData: Partial<Post> = { 
         content: editContent.trim(),
         category: editCategory,
         is_active: editIsActive
@@ -168,7 +169,7 @@ export default function PostCard({ post, onPostUpdated, onPostDeleted }: PostCar
         is_active: editIsActive,
         image_url: editImagePreview || (updateData.remove_image ? null : post.image_url)
       };
-      onPostUpdated(updatedPost);
+      onPostUpdated(updatedPost as Post);
       setIsEditing(false);
       toast.success('Post updated successfully');
     } catch (error) {
@@ -225,10 +226,12 @@ export default function PostCard({ post, onPostUpdated, onPostDeleted }: PostCar
         onClick={() => router.push(`/users/${post.author?.id}`)}
         >
           {post.author?.avatar_url ? (
-            <img
+            <Image
               src={post.author.avatar_url}
               alt={post.author?.username || 'User'}
               className="h-10 w-10 rounded-full object-cover"
+              width={40}
+              height={40}
             />
           ) : (
             <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-medium">
@@ -297,7 +300,7 @@ export default function PostCard({ post, onPostUpdated, onPostDeleted }: PostCar
             {/* Image Upload Section */}
             <div className="space-y-2">
               <label className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 cursor-pointer">
-                <Image className="h-5 w-5" />
+                <ImageLucide className="h-5 w-5" />
                 <span className="text-sm">Change Image</span>
                 <input
                   type="file"
@@ -310,10 +313,12 @@ export default function PostCard({ post, onPostUpdated, onPostDeleted }: PostCar
               {/* Image Preview */}
               {(editImagePreview || (post.image_url && !imageRemoved)) && (
                 <div className="relative">
-                  <img
-                    src={editImagePreview || post.image_url}
+                  <Image
+                    src={editImagePreview || post.image_url || ''}
                     alt="Preview"
                     className="w-full h-48 object-cover rounded-lg"
+                    width={500}
+                    height={500}
                   />
                   <button
                     onClick={removeEditImage}
@@ -338,7 +343,7 @@ export default function PostCard({ post, onPostUpdated, onPostDeleted }: PostCar
                 <label className="text-sm font-medium text-gray-700">Category:</label>
                 <select
                   value={editCategory}
-                  onChange={(e) => setEditCategory(e.target.value)}
+                  onChange={(e) => setEditCategory(e.target.value as "general" | "announcement" | "question")}
                   className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="general">General</option>
@@ -384,10 +389,12 @@ export default function PostCard({ post, onPostUpdated, onPostDeleted }: PostCar
           <>
             <p className="text-gray-900 whitespace-pre-wrap">{post.content}</p>
             {post.image_url && (
-              <img
+              <Image
                 src={post.image_url}
                 alt="Post image"
                 className="mt-3 rounded-lg max-w-full h-auto"
+                width={500}
+                height={500}
               />
             )}
           </>
@@ -434,10 +441,12 @@ export default function PostCard({ post, onPostUpdated, onPostDeleted }: PostCar
             <div className="flex space-x-3">
               <div className="flex-shrink-0">
                 {user?.avatar_url ? (
-                  <img
+                  <Image
                     src={user.avatar_url}
                     alt={user.username}
                     className="h-8 w-8 rounded-full object-cover"
+                    width={32}
+                    height={32}
                   />
                 ) : (
                   <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-medium">
@@ -465,14 +474,16 @@ export default function PostCard({ post, onPostUpdated, onPostDeleted }: PostCar
           </form>
 
           <div className="space-y-3">
-            {comments.map((comment: any) => (
+            {comments.map((comment: { id: number; content: string; author: { id: number; username: string; avatar_url?: string; first_name?: string; last_name?: string; created_at?: string; }; created_at?: string; }) => (
               <div key={comment.id} className="flex space-x-3">
                 <div className="flex-shrink-0">
                   {comment.author?.avatar_url ? (
-                    <img
+                    <Image
                       src={comment.author.avatar_url}
                       alt={comment.author.username || 'User'}
                       className="h-8 w-8 rounded-full object-cover"
+                      width={32}
+                      height={32}
                     />
                   ) : (
                     <div className="h-8 w-8 rounded-full bg-gray-400 flex items-center justify-center text-white text-xs font-medium">
@@ -490,7 +501,7 @@ export default function PostCard({ post, onPostUpdated, onPostDeleted }: PostCar
                         @{comment.author?.username}
                       </span>
                       <span className="text-xs text-gray-400">
-                        {formatDate(comment.created_at)}
+                        {formatDate(comment.created_at || '')}
                       </span>
                     </div>
                     <p className="text-sm text-gray-700">{comment.content}</p>

@@ -7,8 +7,8 @@ interface UsersState {
   currentUser: User | null;
   selectedUser: User | null;
   selectedPosts: Post[];
-  followers: any[];
-  following: any[];
+  followers: Array<{ id: number; following: number; follower: number }>;
+  following: Array<{ id: number; following: number; follower: number }>;
   isLoading: boolean;
   error: string | null;
   is_active: boolean;
@@ -67,8 +67,8 @@ export const fetchUsers = createAsyncThunk(
           hasPrevious: !!response.data.previous,
         }
       };
-    } catch (error: any) {
-      const message = error.response?.data?.error || 'Failed to fetch users';
+    } catch (error: unknown) {
+      const message = (error as any)?.response?.data?.error || 'Failed to fetch users';
       return rejectWithValue(message);
     }
   }
@@ -80,7 +80,7 @@ export const detailUsers = createAsyncThunk(
     try {
       const response = await userAPI.getDetailUsers();
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       const message = error.response?.data?.error || 'Failed to fetch detail users';
       return rejectWithValue(message);
     }
@@ -102,7 +102,7 @@ export const searchUsers = createAsyncThunk(
           hasPrevious: false,
         }
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       const message = error.response?.data?.error || 'Failed to search users';
       return rejectWithValue(message);
     }
@@ -115,7 +115,7 @@ export const fetchUser = createAsyncThunk(
     try {
       const response = await userAPI.getUser(id);
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       const message = error.response?.data?.error || 'Failed to fetch user';
       return rejectWithValue(message);
     }
@@ -141,7 +141,7 @@ export const followUser = createAsyncThunk(
       await socialAPI.followUser(userId);
       toast.success('User followed successfully!');
       return userId;
-    } catch (error: any) {
+    } catch (error: unknown) {
       const message = error.response?.data?.error || 'Failed to follow user';
       toast.error(message);
       return rejectWithValue(message);
@@ -156,7 +156,7 @@ export const unfollowUser = createAsyncThunk(
       await socialAPI.unfollowUser(userId);
       toast.success('User unfollowed successfully!');
       return userId;
-    } catch (error: any) {
+    } catch (error: unknown) {
       const message = error.response?.data?.error || 'Failed to unfollow user';
       toast.error(message);
       return rejectWithValue(message);
@@ -171,7 +171,7 @@ export const fetchFollowers = createAsyncThunk(
       const response = await socialAPI.getFollowers(userId);
       
       return { userId, followers: response.data.results || response.data };
-    } catch (error: any) {
+    } catch (error: unknown) {
       const message = error.response?.data?.error || 'Failed to fetch followers';
       return rejectWithValue(message);
     }
@@ -185,7 +185,7 @@ export const fetchFollowing = createAsyncThunk(
       const response = await socialAPI.getFollowing(userId);
       
       return { userId, following: response.data.results || response.data };
-    } catch (error: any) {
+    } catch (error: unknown) {
       const message = error.response?.data?.error || 'Failed to fetch following';
       return rejectWithValue(message);
     }
@@ -199,7 +199,7 @@ export const fetchUserPosts = createAsyncThunk(
       const response = await userAPI.getUserPosts(userId);
       
       return { userId, posts: response.data.results || response.data };
-    } catch (error: any) {
+    } catch (error: unknown) {
       const message = error.response?.data?.error || 'Failed to fetch user posts';
       return rejectWithValue(message);
     }

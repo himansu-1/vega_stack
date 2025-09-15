@@ -6,8 +6,9 @@ import { useRouter, useParams } from 'next/navigation';
 import { fetchUser } from '@/store/slices/usersSlice';
 import { User, userAPI } from '@/lib/api';
 import Navigation from '@/components/Navigation';
-import { ArrowLeft, Save, Mail, Shield, Globe, MapPin, UserIcon } from 'lucide-react';
+import { ArrowLeft, Save, Shield, Globe, UserIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
+import Image from 'next/image';
 
 export default function EditUserPage() {
   const { user: currentUser, isAuthenticated } = useAppSelector((state) => state.auth);
@@ -88,7 +89,7 @@ export default function EditUserPage() {
   };
 
   const handleSave = async () => {
-    if (!selectedUser) return;
+    if (!selectedUser || !currentUser) return;
 
     setIsSaving(true);
     try {
@@ -99,11 +100,30 @@ export default function EditUserPage() {
           formData.append(key, value as string);
         });
         formData.append('avatar', avatarFile);
-        await userAPI.updateUserWithFormData(selectedUser.id, formData);
-      } else {
-        // If no avatar file, use regular JSON update
-        await userAPI.updateUser(selectedUser.id, editForm as Partial<User>);
-      }
+        
+        // Use appropriate API based on user role and target user
+        if (currentUser.role === 'admin' && currentUser.id !== selectedUser.id) {
+          await userAPI.updateUserWithFormData(selectedUser.id, formData);
+        } else {
+          // User editing their own profile - remove restricted fields from FormData
+          const restrictedFields = ['role', 'is_active', 'followers_count', 'following_count', 'posts_count'];
+          restrictedFields.forEach(field => {
+            formData.delete(field);
+          });
+          await userAPI.updateMeWithFormData(formData);
+        }
+        } else {
+          // If no avatar file, use regular JSON update
+          if (currentUser.role === 'admin' && currentUser.id !== selectedUser.id) {
+            await userAPI.updateUser(selectedUser.id, editForm as Partial<User>);
+          } else {
+            // User editing their own profile - remove restricted fields
+            const userUpdateData = { ...editForm };
+            delete userUpdateData.role;
+            delete userUpdateData.is_active;
+            await userAPI.updateMe(userUpdateData as Partial<User>);
+          }
+        }
       toast.success('User updated successfully!');
       router.push(`/users/${selectedUser.id}`);
     } catch (error) {
@@ -173,11 +193,14 @@ export default function EditUserPage() {
                 <div className="flex items-center space-x-4">
                   <div className="relative">
                     {avatarPreview ? (
-                      <img
-                        src={avatarPreview}
-                        alt="Avatar preview"
-                        className="w-20 h-20 rounded-full object-cover border-2 border-gray-300"
-                      />
+                      <Image
+                      src={avatarPreview}
+                      alt="Avatar preview"
+                      width={80}
+                      height={80}
+                      className="rounded-full object-cover border-2 border-gray-300"
+                      unoptimized
+                    />
                     ) : (
                       <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center border-2 border-gray-300">
                         <UserIcon className="h-8 w-8 text-gray-400" />

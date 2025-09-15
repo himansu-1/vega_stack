@@ -4,17 +4,17 @@ import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { logoutUser } from '@/store/slices/authSlice';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { 
   Home, 
   User, 
   Bell, 
   Settings, 
   LogOut, 
-  Users,
   BarChart3,
   Search
 } from 'lucide-react';
+import Image from 'next/image';
 
 export default function Navigation() {
   const { user, isLoading } = useAppSelector((state) => state.auth);
@@ -99,10 +99,12 @@ export default function Navigation() {
               className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors"
             >
               {user?.avatar_url ? (
-                <img
+                <Image
                   src={user.avatar_url}
                   alt={user.username}
                   className="h-8 w-8 rounded-full object-cover"
+                  width={32}
+                  height={32}
                 />
               ) : (
                 <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-medium">

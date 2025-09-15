@@ -32,8 +32,8 @@ export const loginUser = createAsyncThunk(
       localStorage.setItem('refresh_token', refresh);
       
       return { token, refresh, user };
-    } catch (error: any) {
-      const message = error.response?.data?.error || 'Login failed';
+    } catch (error: unknown) {
+      const message = (error as any)?.response?.data?.error || 'Login failed';
       toast.error(message);
       return rejectWithValue(message);
     }
@@ -54,7 +54,7 @@ export const registerUser = createAsyncThunk(
       await authAPI.register(userData);
       toast.success('Registration successful! Please login.');
       return true;
-    } catch (error: any) {
+    } catch (error: unknown) {
       const message = error.response?.data?.error || 'Registration failed';
       toast.error(message);
       return rejectWithValue(message);
@@ -74,7 +74,7 @@ export const logoutUser = createAsyncThunk(
       localStorage.removeItem('refresh_token');
       toast.success('Logged out successfully');
       return true;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Logout error:', error);
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
@@ -90,7 +90,7 @@ export const updateUserProfile = createAsyncThunk(
       // This would be implemented with the actual API call
       toast.success('Profile updated successfully!');
       return userData;
-    } catch (error: any) {
+    } catch (_error: unknown) {
       toast.error('Failed to update profile');
       return rejectWithValue('Update failed');
     }

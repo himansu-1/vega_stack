@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { useAppSelector } from '@/store/hooks';
-import { Image, X } from 'lucide-react';
+import { X, Image as ImageLucide } from 'lucide-react';
+import Image from 'next/image';
 
 interface CreatePostProps {
   onPostCreated: (postData: { content: string; image_file?: File; category?: string }) => Promise<void>;
@@ -75,10 +76,13 @@ export default function CreatePost({ onPostCreated }: CreatePostProps) {
     <div className="bg-white rounded-lg shadow-sm border p-6">
       <div className="flex items-start space-x-3 mb-4">
         {user.avatar_url ? (
-          <img
+          <Image
             src={user.avatar_url}
             alt={user.username}
-            className="h-10 w-10 rounded-full object-cover"
+            width={40}
+            height={40}
+            className="rounded-full object-cover"
+            unoptimized
           />
         ) : (
           <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-medium">
@@ -106,7 +110,7 @@ export default function CreatePost({ onPostCreated }: CreatePostProps) {
         <div className="flex items-center justify-between mt-2 mb-4">
           <div className="flex items-center space-x-4">
             <label className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 cursor-pointer">
-              <Image className="h-5 w-5" />
+              <ImageLucide className="h-5 w-5" />
               <span className="text-sm">Add Image</span>
               <input
                 type="file"
@@ -126,10 +130,12 @@ export default function CreatePost({ onPostCreated }: CreatePostProps) {
 
         {imagePreview && (
           <div className="relative mb-4">
-            <img
+            <Image
               src={imagePreview}
               alt="Preview"
               className="w-full h-48 object-cover rounded-lg"
+              width={500}
+              height={500}
             />
             <button
               type="button"

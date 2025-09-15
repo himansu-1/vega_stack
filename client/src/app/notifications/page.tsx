@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { markNotificationAsRead, markAllNotificationsAsRead, clearNotifications } from '@/store/slices/notificationsSlice';
 import Navigation from '@/components/Navigation';
 import { formatDate } from '@/lib/utils';
-import { Bell, Check, CheckCheck, RefreshCw } from 'lucide-react';
+import { Bell, Check, CheckCheck } from 'lucide-react';
 
 export default function NotificationsPage() {
   const { user, isLoading, isAuthenticated } = useAppSelector((state) => state.auth);
@@ -112,7 +112,7 @@ export default function NotificationsPage() {
           <div className="text-center py-12">
             <Bell className="h-16 w-16 text-gray-300 mx-auto mb-4" />
             <p className="text-gray-500 text-lg">No notifications yet</p>
-            <p className="text-gray-400 text-sm">You'll see notifications here when people interact with your posts</p>
+            <p className="text-gray-400 text-sm">You&apos;ll see notifications here when people interact with your posts</p>
           </div>
         ) : (
           <div className="space-y-4">

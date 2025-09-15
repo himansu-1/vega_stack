@@ -49,6 +49,7 @@ api.interceptors.response.use(
         }
       } catch (refreshError) {
         // Refresh failed, redirect to login
+        console.log('Refresh failed', refreshError);
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
         window.location.href = '/login';
@@ -78,6 +79,7 @@ export interface User {
   date_joined?: string;
   last_login?: string;
   is_following?: boolean;
+  is_following_back?: boolean;
 }
 
 export interface Post {
@@ -87,6 +89,8 @@ export interface Post {
   created_at: string;
   updated_at: string;
   image_url?: string;
+  image_file?: File;
+  remove_image?: boolean;
   category: 'general' | 'announcement' | 'question';
   is_active: boolean;
   like_count: number;
@@ -150,6 +154,11 @@ export const userAPI = {
   getCurrentUser: () => api.get('/users/me/'),
   updateMe: (data: Partial<User>) => api.put('/users/me/', data),
   patchMe: (data: Partial<User>) => api.patch('/users/me/', data),
+  updateMeWithFormData: (data: FormData) => api.patch('/users/me/', data, {
+    headers: {
+      'Content-Type': undefined, // Let Axios set the correct boundary
+    },
+  }),
   getUsers: (page: number = 1, perPage: number = 20) => api.get(`/users/?page=${page}&per_page=${perPage}`),
   getUser: (id: number) => api.get(`/userdetails/${id}/`),
   getDetailUsers: () => api.get('/users/details/'),

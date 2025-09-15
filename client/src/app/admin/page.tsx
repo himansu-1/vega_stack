@@ -3,13 +3,13 @@
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { detailUsers, fetchUsers, searchUsers } from '@/store/slices/usersSlice';
+import { detailUsers, fetchUsers } from '@/store/slices/usersSlice';
 import { User, userAPI } from '@/lib/api';
 import Navigation from '@/components/Navigation';
 import { formatNumber } from '@/lib/utils';
-import { Users, BarChart3, Trash2, UserMinus, Shield, Search, Edit, Eye, X } from 'lucide-react';
+import { Users, BarChart3, Trash2, UserMinus, Shield, Edit, X } from 'lucide-react';
 import toast from 'react-hot-toast';
-import UserSearch from '@/components/UserSearch';
+import Image from 'next/image';
 
 export default function AdminPage() {
   const { user, isLoading, isAuthenticated } = useAppSelector((state) => state.auth);
@@ -17,7 +17,7 @@ export default function AdminPage() {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [editingUser, setEditingUser] = useState<any>(null);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
   const [editForm, setEditForm] = useState({
     first_name: '',
     last_name: '',
@@ -25,7 +25,7 @@ export default function AdminPage() {
     role: '',
     is_active: true,
   });
-  const [perPage, setPerPage] = useState<number>(2);
+  const [perPage, setPerPage] = useState<number>(20);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -40,7 +40,7 @@ export default function AdminPage() {
       dispatch(detailUsers({ rejectWithValue: null }));
       dispatch(fetchUsers({ page: currentPage, perPage: perPage }));
     }
-  }, [dispatch, user, currentPage]);
+  }, [dispatch, user, currentPage, perPage]);
 
   const handleDeactivateUser = async (userId: number) => {
     if (window.confirm('Are you sure you want to deactivate this user?')) {
@@ -49,7 +49,7 @@ export default function AdminPage() {
     }
   };
 
-  const handleEditUser = (userItem: any) => {
+  const handleEditUser = (userItem: User) => {
     setEditingUser(userItem);
     setEditForm({
       first_name: userItem.first_name || '',
@@ -228,10 +228,12 @@ export default function AdminPage() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         {userItem.avatar_url ? (
-                          <img
+                          <Image
                             src={userItem.avatar_url}
                             alt={userItem.username}
                             className="h-10 w-10 rounded-full object-cover"
+                            width={40}
+                            height={40}
                           />
                         ) : (
                           <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-medium">
@@ -331,6 +333,17 @@ export default function AdminPage() {
                   >
                     Next
                   </button>
+                </div>
+                {/* Dropdown to choose per page */}
+                <div className="flex space-x-2">
+                  <select
+                    value={perPage}
+                    onChange={(e) => setPerPage(parseInt(e.target.value))}
+                    className="px-3 py-1 border border-gray-300 rounded-md text-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <option value={20}>20</option>
+                    <option value={50}>50</option>
+                  </select>
                 </div>
               </div>
             </div>

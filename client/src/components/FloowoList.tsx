@@ -2,9 +2,13 @@ import { useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { fetchFollowers, fetchFollowing } from "@/store/slices/usersSlice";
+import { AppDispatch, RootState } from "@/store";
+import { User } from "@/lib/api";
+import Image from "next/image";
 
-export default function FollowList({ id, slug, dispatch }: { id: any, slug: any, dispatch: any }) {
-    const { followers, following, isLoading } = useSelector((state: any) => state.users);
+
+export default function FollowList({ id, slug, dispatch }: { id: number, slug: string, dispatch: AppDispatch }) {
+    const { followers, following, isLoading } = useSelector((state: RootState) => state.users);
     const router = useRouter();
 
     useEffect(() => {
@@ -53,16 +57,18 @@ export default function FollowList({ id, slug, dispatch }: { id: any, slug: any,
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {users.map((user: any) => (
+                        {users.map((user: { id: number; username: string; avatar_url?: string; first_name?: string; last_name?: string; bio?: string; followers_count?: number; following_count?: number; posts_count?: number; }) => (
                             <div key={user.id} className="bg-white rounded-lg shadow-sm border p-6">
                                 <div className="flex items-center space-x-4 mb-4 cursor-pointer"
-                                onClick={() => router.push(`/users/${user.id}`)}
+                                    onClick={() => router.push(`/users/${user.id}`)}
                                 >
                                     {user.avatar_url ? (
-                                        <img
+                                        <Image
                                             src={user.avatar_url}
                                             alt={user.username}
                                             className="h-12 w-12 rounded-full object-cover"
+                                            width={48}
+                                            height={48}
                                         />
                                     ) : (
                                         <div className="h-12 w-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-medium">

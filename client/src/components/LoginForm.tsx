@@ -89,7 +89,7 @@ export default function LoginForm({ onSwitchToRegister, onLogin, isLoading }: Lo
           onClick={onSwitchToRegister}
           className="text-blue-600 hover:text-blue-500 text-sm font-medium"
         >
-          Don't have an account? Sign up
+          Don&apos;t have an account? Sign up
         </button>
       </div>
     </form>

@@ -1,8 +1,4 @@
 'use client';
-
-import { useAppSelector } from '@/store/hooks';
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import Navigation from '@/components/Navigation';
 import UserSearch from '@/components/UserSearch';
 

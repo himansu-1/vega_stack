@@ -49,7 +49,7 @@ export default function FeedPage() {
       <div className="max-w-2xl mx-auto py-8 px-4">
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome back, {user.first_name}!</h1>
-          <p className="text-gray-600">Here's what's happening in your network</p>
+          <p className="text-gray-600">Here&apos;s what&apos;s happening in your network</p>
         </div>
 
         <div className="space-y-6">

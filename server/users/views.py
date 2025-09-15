@@ -82,6 +82,7 @@ class LogoutView(APIView):
 
 class EditUserView(APIView):
     permission_classes = [permissions.IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
 
     def handle_image_upload(self, image_file: InMemoryUploadedFile):
         # Validate file size (under 500MB)
@@ -128,6 +129,30 @@ class EditUserView(APIView):
     def get(self, request):
         serializer = UserMeSerializer(request.user)
         return Response(serializer.data, status=200)
+
+    def patch(self, request):
+        """Handle PATCH requests for current user profile updates"""
+        try:
+            data = request.data.copy()
+
+            # Handle image upload
+            if 'avatar' in request.FILES:
+                try:
+                    avatar_url = self.handle_image_upload(request.FILES['avatar'])
+                    data['avatar_url'] = avatar_url
+                except ValueError as e:
+                    return Response({"error": str(e)}, status=400)
+
+            serializer = UserEditSerializer(request.user, data=data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({"message": "Profile updated successfully"}, status=200)
+            else:
+                return Response({"error": "Validation failed", "details": serializer.errors}, status=400)
+                
+        except Exception as e:
+            print(f"Error in patch method: {str(e)}")
+            return Response({"error": "Internal server error", "details": str(e)}, status=500)
 
     def put(self, request, pk):
         try:

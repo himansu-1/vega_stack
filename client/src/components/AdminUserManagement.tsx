@@ -5,6 +5,7 @@ import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { fetchUsers } from '@/store/slices/usersSlice';
 import { formatNumber } from '@/lib/utils';
 import { UserMinus, Shield, User } from 'lucide-react';
+import Image from 'next/image';
 
 export default function AdminUserManagement() {
   const { users, isLoading, pagination } = useAppSelector((state) => state.users);
@@ -78,10 +79,12 @@ export default function AdminUserManagement() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       {userItem.avatar_url ? (
-                        <img
+                        <Image
                           src={userItem.avatar_url}
                           alt={userItem.username}
                           className="h-10 w-10 rounded-full object-cover"
+                          width={40}
+                          height={40}
                         />
                       ) : (
                         <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-medium">
